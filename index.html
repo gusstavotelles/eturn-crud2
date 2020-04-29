@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-br" ng-app="myApp">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CRUD com AngularJS</title>
+    <link rel="stylesheet" type="text/css" href="bootstrap.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="angular.min.js"></script>
+    <script src="app.js"></script>
+  </head>
+
+  <body ng-controller="controller">
+    <hr />
+    <div class="col-md-offset-4 col-md-4">
+      <h2>Listagem de Contatos</h2>
+    </div>
+    <div class="col-md-4">
+      <button
+        type="button"
+        class="btn btn-primary"
+        data-toggle="modal"
+        data-target="#myModal"
+        ng-click="novo()"
+      >
+        Novo
+      </button>
+    </div>
+    <hr />
+    <div class="col-md-offset-1 col-md-9">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th style="border: 0px;">Nome</th>
+            <th style="border: 0px;">Telefone(s)</th>
+            <th style="border: 0px;">E-mail</th>
+            <th style="border: 0px;">Endereço(s)</th>
+            <th style="border: 0px;">Observações</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="contato in contatos">
+            <td>{{contato.nome}}</td>
+            <td>
+              <ul class="example-animate-container">
+                <li class="animate-repeat" ng-repeat="tel in contato.telefones">
+                  {{tel}}
+                </li>
+              </ul>
+            </td>
+            <td>{{contato.email}}</td>
+            <td>
+              <ul class="example-animate-container">
+                <li class="animate-repeat" ng-repeat="end in contato.enderecos">
+                  {{end.logradouro}}, {{end.numero}}, {{end.localidade}},
+                  {{end.municipio}}, {{end.uf}} - {{end.cep}}
+                </li>
+              </ul>
+            </td>
+            <td>{{contato.observacoes}}</td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-warning"
+                data-toggle="modal"
+                data-target="#myModal"
+                ng-click="editar(contato)"
+              >
+                Editar
+              </button>
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-danger"
+                data-toggle="modal"
+                data-target="#myModalExcluir"
+                ng-click="selecionaContato(contato)"
+              >
+                Excluir
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" tabindex="-1" id="myModal" role="dialog">
+      <div class="modal-dialog modal-lg" role="dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="pull-right">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Fechar
+              </button>
+              <button
+                id="salvar"
+                type="submit"
+                class="btn btn-primary"
+                ng-click="salvar()"
+                ng-show="!edicao"
+              >
+                Salvar
+              </button>
+              <button
+                id="salvarEdicao"
+                type="submit"
+                class="btn btn-primary"
+                ng-click="salvar()"
+                ng-show="edicao"
+              >
+                Salvar Alterações
+              </button>
+            </div>
+            <h4 class="modal-title">Novo Cadastro</h4>
+          </div>
+          <div class="modal-body">
+            <form class="form-horizontal" role="form">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="nome">Nome Completo</label>
+                  <input
+                    name="nome"
+                    type="text"
+                    class="form-control"
+                    placeholder="Nome"
+                    ng-model="novoContato.nome"
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="telefone">Telefone</label>
+                  <input
+                    name="telefone"
+                    type="tel"
+                    maxlength="11"
+                    class="form-control"
+                    placeholder="Telefone"
+                    ng-model="novoContato.telefone"
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="email">E-mail</label>
+                  <input
+                    name="email"
+                    type="email"
+                    class="form-control"
+                    placeholder="E-mail"
+                    ng-model="novoContato.email"
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <div class="form-group">
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      ng-click="removeTelefone()"
+                      class="btn btn-secondary"
+                    >
+                      Remover
+                    </button>
+                    <button
+                      type="button"
+                      ng-click="adicionaTelefone(novoContato.telefone)"
+                      class="btn btn-light"
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <div class="form-group">
+                  <ul class="example-animate-container">
+                    <li
+                      class="animate-repeat"
+                      ng-repeat="tel in novoContato.telefones"
+                    >
+                      {{tel}}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="observacoes">Observações</label>
+                  <textarea
+                    name="observacoes"
+                    type="text"
+                    class="form-control"
+                    placeholder="Observações"
+                    ng-model="novoContato.observacoes"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <h4 class="modal-title">Endereço</h4>
+                  <br />
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="cep">CEP</label>
+                  <input
+                    name="cep"
+                    type="text"
+                    maxlength="8"
+                    class="form-control"
+                    placeholder="CEP"
+                    ng-model="novoContato.endereco.cep"
+                    mask="00000-000"
+                    ng-blur="buscaCep(novoContato.endereco.cep)"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="logradouro">Logradouro</label>
+                  <input
+                    name="logradouro"
+                    type="text"
+                    class="form-control"
+                    placeholder="Logradouro"
+                    ng-model="novoContato.endereco.logradouro"
+                    readonly
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label for="numero">Nº</label>
+                  <input
+                    name="numero"
+                    type="text"
+                    class="form-control"
+                    maxlength="6"
+                    placeholder="Nº"
+                    ng-model="novoContato.endereco.numero"
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-5">
+                <div class="form-group">
+                  <label for="localidade">Localidade</label>
+                  <input
+                    name="localidade"
+                    type="text"
+                    class="form-control"
+                    placeholder="Localidade"
+                    ng-model="novoContato.endereco.localidade"
+                    readonly
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-5">
+                <div class="form-group">
+                  <label for="municipio">Municipio</label>
+                  <input
+                    name="municipio"
+                    type="text"
+                    class="form-control"
+                    placeholder="Municipio"
+                    ng-model="novoContato.endereco.municipio"
+                    readonly
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label for="uf">UF</label>
+                  <input
+                    name="uf"
+                    type="text"
+                    class="form-control"
+                    placeholder="UF"
+                    ng-model="novoContato.endereco.uf"
+                    readonly
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <div class="form-group">
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      ng-click="removeEndereco()"
+                      class="btn btn-secondary"
+                    >
+                      Remover
+                    </button>
+                    <button
+                      type="button"
+                      ng-click="adicionaEndereco(novoContato.endereco)"
+                      class="btn btn-light"
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <div class="form-group">
+                  <ul class="example-animate-container">
+                    <li
+                      class="animate-repeat"
+                      ng-repeat="end in novoContato.enderecos"
+                    >
+                      {{end.logradouro}}, {{end.numero}}, {{end.localidade}},
+                      {{end.municipio}}, {{end.uf}} - {{end.cep}}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </form>
+            <div class="modal-footer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModalEditar" role="dialog">
+      <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+              &times;
+            </button>
+            <h4 class="modal-title">Editar Cadastro</h4>
+          </div>
+          <div class="modal-body">
+            <form class="form-horizontal" role="form">
+              <div class="form-group">
+                <label class="control-label col-md-2">Nome</label>
+                <div class="col-md-10">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Nome"
+                    ng-model="contatoSelecionado.nome"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label col-md-2">Telefone</label>
+                <div class="col-md-10">
+                  <input
+                    type="tel"
+                    class="form-control"
+                    placeholder="Telefone"
+                    ng-model="contatoSelecionado.telefone"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label col-md-2">E-mail</label>
+                <div class="col-md-10">
+                  <input
+                    type="email"
+                    class="form-control"
+                    placeholder="E-mail"
+                    ng-model="contatoSelecionado.email"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Fechar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              ng-click="alterarContato()"
+              data-dismiss="modal"
+            >
+              Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModalExcluir" role="dialog">
+      <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+              &times;
+            </button>
+            <h4 class="modal-title">Confirma exclusão do contato?</h4>
+          </div>
+          <div class="modal-body">
+            <h4 style="font-weight: bolder;">
+              Você vai excluir o Cadastro de {{contatoSelecionado.nome}}
+            </h4>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-dismiss="modal"
+              ng-click="excluirContato()"
+              data-dismiss="modal"
+            >
+              Sim
+            </button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Não
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
